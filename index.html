@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dashboard học và ôn từ vựng theo chủ đề, level và hai chiều Việt - Anh." />
+  <title>WordFlow - Vocabulary Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%231d4ed8'/%3E%3Cpath d='M15 19h9l8 24 8-24h9L37 50H27z' fill='white'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Điều hướng chính">
+      <div class="brand"><span class="brand-mark">W</span><span>WordFlow</span></div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-view="review"><span>◎</span>Ôn luyện</button>
+        <button class="nav-item" data-view="vocabulary"><span>☷</span>Kho từ vựng</button>
+        <button class="nav-item" data-view="stats"><span>▥</span>Thống kê</button>
+      </nav>
+      <div class="sidebar-note">
+        <strong>Dữ liệu của bạn</strong>
+        <p>Được lưu trong trình duyệt này. Không mất khi tải lại trang.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" aria-label="Mở menu">☰</button>
+        <div><p class="eyebrow">VOCABULARY WORKSPACE</p><h1 id="pageTitle">Ôn luyện</h1></div>
+        <div class="top-actions"><button class="ghost-btn" id="exportBtn">Xuất dữ liệu</button><label class="ghost-btn import-label">Nhập dữ liệu<input type="file" id="importInput" accept="application/json" hidden></label></div>
+      </header>
+
+      <section id="reviewView" class="view active">
+        <div class="review-layout">
+          <div class="panel controls-panel">
+            <div class="section-heading"><div><p class="eyebrow">THIẾT LẬP</p><h2>Chọn nội dung ôn</h2></div></div>
+            <label>Chủ đề<select id="reviewTopic"></select></label>
+            <label>Level<select id="reviewLevel"><option value="all">Tất cả level</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option></select></label>
+            <fieldset><legend>Chiều ôn</legend><label class="radio-row"><input type="radio" name="direction" value="en-vi" checked><span><strong>Anh → Việt</strong><small>Nhìn từ tiếng Anh, nhập nghĩa Việt</small></span></label><label class="radio-row"><input type="radio" name="direction" value="vi-en"><span><strong>Việt → Anh</strong><small>Nhìn nghĩa Việt, nhập từ tiếng Anh</small></span></label></fieldset>
+            <button class="primary-btn" id="startReview">Bắt đầu ôn</button>
+            <p class="helper">Từ trả lời sai sẽ quay lại cuối hàng đợi. Khi đúng hết 100%, chủ đề được đánh dấu hoàn thành.</p>
+          </div>
+
+          <div class="panel quiz-panel" id="quizPanel">
+            <div class="empty-quiz" id="quizEmpty"><div class="empty-icon">◎</div><h2>Sẵn sàng ôn từ</h2><p>Chọn chủ đề, level và chiều ôn rồi nhấn “Bắt đầu ôn”.</p></div>
+            <div class="quiz-content hidden" id="quizContent">
+              <div class="quiz-meta"><span id="quizTopicBadge" class="badge">Chủ đề</span><span id="quizLevelBadge" class="badge neutral">B1</span><span id="quizCounter">1 / 10</span></div>
+              <div class="progress-track"><div id="quizProgress" class="progress-fill"></div></div>
+              <p class="quiz-label" id="quizLabel">Nhập nghĩa tiếng Việt</p>
+              <div class="word-row"><h2 id="quizPrompt">approachable</h2><button class="speak-btn" id="speakBtn" aria-label="Nghe phát âm giọng Mỹ">🔊</button></div>
+              <p class="example" id="quizExample"></p>
+              <form id="answerForm"><input id="answerInput" autocomplete="off" placeholder="Nhập câu trả lời..." /><button class="primary-btn" type="submit">Kiểm tra</button></form>
+              <div id="feedback" class="feedback hidden"></div>
+              <button id="nextBtn" class="secondary-btn hidden">Tiếp tục</button>
+            </div>
+            <div class="completion hidden" id="completion"><div class="complete-ring">100%</div><h2>Hoàn thành!</h2><p id="completionText"></p><button class="primary-btn" id="reviewAgain">Ôn lại</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="vocabularyView" class="view">
+        <div class="panel vocab-toolbar"><div><p class="eyebrow">QUẢN LÝ DỮ LIỆU</p><h2>Danh sách từ và cụm từ</h2></div><button class="primary-btn" id="addWordBtn">+ Thêm từ mới</button></div>
+        <div class="panel filters"><input id="searchInput" placeholder="Tìm từ, nghĩa hoặc ví dụ..."/><select id="filterTopic"></select><select id="filterLevel"><option value="all">Tất cả level</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option></select></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Từ / cụm từ</th><th>Nghĩa</th><th>Chủ đề</th><th>Level</th><th>Trạng thái</th><th></th></tr></thead><tbody id="wordTable"></tbody></table><div id="wordEmpty" class="table-empty hidden">Chưa có từ phù hợp.</div></div>
+      </section>
+
+      <section id="statsView" class="view">
+        <div class="stat-grid"><article class="stat-card"><span>Tổng từ vựng</span><strong id="totalWords">0</strong><small>trong kho từ</small></article><article class="stat-card"><span>Đã học</span><strong id="learnedWords">0</strong><small>đã trả lời đúng</small></article><article class="stat-card"><span>Chủ đề hoàn thành</span><strong id="completedTopics">0</strong><small>đạt 100%</small></article><article class="stat-card"><span>Tỉ lệ ghi nhớ</span><strong id="masteryRate">0%</strong><small>toàn bộ dữ liệu</small></article></div>
+        <div class="stats-layout"><div class="panel"><div class="section-heading"><div><p class="eyebrow">PHÂN BỔ</p><h2>Từ vựng theo level</h2></div></div><div id="levelChart" class="bar-chart"></div></div><div class="panel"><div class="section-heading"><div><p class="eyebrow">TIẾN ĐỘ</p><h2>Theo chủ đề</h2></div></div><div id="topicStats" class="topic-stats"></div></div></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="wordDialog">
+    <form method="dialog" id="wordForm">
+      <div class="dialog-head"><div><p class="eyebrow">VOCABULARY</p><h2 id="dialogTitle">Thêm từ mới</h2></div><button type="button" class="icon-btn" data-close-dialog aria-label="Đóng">×</button></div>
+      <input type="hidden" id="wordId" />
+      <div class="form-grid"><label>Từ / cụm từ tiếng Anh<input id="englishInput" required placeholder="e.g. approachable"/></label><label>Nghĩa tiếng Việt<input id="vietnameseInput" required placeholder="e.g. dễ gần"/></label><label>Chủ đề<input id="topicInput" required list="topicSuggestions" placeholder="e.g. Appearance"/><datalist id="topicSuggestions"></datalist></label><label>Level<select id="levelInput"><option>A1</option><option>A2</option><option selected>B1</option><option>B2</option><option>C1</option></select></label><label class="full">Ví dụ<input id="exampleInput" placeholder="e.g. Her smile makes her look approachable."/></label></div>
+      <div class="dialog-actions"><button type="button" class="ghost-btn" data-close-dialog>Hủy</button><button class="primary-btn" type="submit" value="default">Lưu từ vựng</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js" type="module"></script>
+</body>
+</html>
